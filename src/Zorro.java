@@ -11,14 +11,19 @@ import java.util.Properties;
 
 public class Zorro {
 	private Connection db = null;
-	private Properties config= null;
-	private PreparedStatement currentStatement= null;
-	private ResultSet currentResultSet=null;
+	private static Properties config = null;
+	private PreparedStatement currentStatement = null;
+	private ResultSet currentResultSet = null;
+	
 	public Zorro() {
-		config=Config.getConfig();
+		if (config == null) {
+			config=Config.getConfig();
+		}
 	}
 	public Zorro(String sql) throws SQLException {
-		config=Config.getConfig();
+		if (config == null) {
+			config=Config.getConfig();
+		}
 		connect();
 		exe(sql);
 		printResult();
@@ -71,14 +76,16 @@ public class Zorro {
 			}else if(params[i] instanceof Double){
 				stmt.setDouble(paramIndex, ((Double)params[i]));
 			}else{
-				throw new SQLException("Unknown parameter");
+				throw new SQLException("Unknown parameter class");
 			}
 		}
 		return stmt;
 	}
 	public void closeStmt(){ //When a Statement object is closed, its current ResultSet object, if one exists, is also closed.
 		if(currentStatement!=null){
-			try {currentStatement.close();} catch (SQLException e) {}
+			try {
+				currentStatement.close();
+			} catch (SQLException e) {}
 		}
 	}
 	public void close(){
