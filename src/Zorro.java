@@ -1,4 +1,5 @@
 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -56,6 +57,10 @@ public class Zorro {
 		return currentStatement.executeUpdate();
 	}
 	private PreparedStatement prepare(PreparedStatement stmt, String sql,Object[] params) throws SQLException{
+		if ( db == null ) {
+			throw new SQLException( "Not connected to database" );
+		}
+		
 		stmt = db.prepareStatement(sql);
 		for(int i=0;i<params.length;i++){
 			int paramIndex=i+1;
@@ -77,6 +82,10 @@ public class Zorro {
 		}
 	}
 	public void close(){
+		if ( db == null ) {
+			// No connection so nothing to close
+			return;
+		}
 		try {
 			db.close();
 		} catch (SQLException e) {}
