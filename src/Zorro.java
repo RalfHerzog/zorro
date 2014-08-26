@@ -20,6 +20,11 @@ public class Zorro {
 			config=Config.getConfig();
 		}
 	}
+	public Zorro(Properties config) {
+		if (config != null) {
+			Zorro.config=config;
+		}
+	}
 	public Zorro(String sql) throws SQLException {
 		if (config == null) {
 			config=Config.getConfig();

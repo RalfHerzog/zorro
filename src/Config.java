@@ -7,11 +7,14 @@ import java.util.Properties;
 
 public class Config {
 	public static Properties getConfig(){
+		return getConfigFromFile("config/config.properties");
+	}
+	
+	public static Properties getConfigFromFile(String filepath) {
 		Properties prop = new Properties();
 		InputStream input = null;
-	 
 		try {
-			input = new FileInputStream("config/config.properties");
+			input = new FileInputStream(filepath);
 			prop.load(input);
 		} catch (IOException ex) {
 			ex.printStackTrace();
