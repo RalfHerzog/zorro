@@ -1,8 +1,10 @@
+
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class Example {
-	public static void main(String [] args) throws Exception{
+	public static void main(String [] args) throws SQLException{
 		//Shortest usage example, selects content and print it the connection is also closed
 		new Zorro("select * from mytable");
 		

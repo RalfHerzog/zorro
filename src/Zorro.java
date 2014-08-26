@@ -1,5 +1,4 @@
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,27 +16,31 @@ public class Zorro {
 	public Zorro() {
 		config=Config.getConfig();
 	}
-	public Zorro(String sql) throws Exception {
+	public Zorro(String sql) throws SQLException {
 		config=Config.getConfig();
 		connect();
 		exe(sql);
 		printResult();
 		close();
 	}
-	public void connect() throws Exception {
+	public void connect() throws SQLException {
 		connect(config.getProperty("dbhost"), config.getProperty("dbname"), config.getProperty("dbuser"), config.getProperty("dbpass"));
 	}
-	public void connect(String dbHost, String dbName, String dbUser, String dbPass) throws Exception{
+	public void connect(String dbHost, String dbName, String dbUser, String dbPass) throws SQLException{
 		if(db!=null){
 			db.close();
 		}
-		Class.forName("com.mysql.jdbc.Driver");
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch ( ClassNotFoundException e ) {
+			e.printStackTrace();
+		}
 		db = DriverManager.getConnection("jdbc:mysql://" + dbHost + "/"+ dbName, dbUser, dbPass);
 	}
-	public ResultSet exe(String sql) throws Exception{
+	public ResultSet exe(String sql) throws SQLException{
 		return exe(sql, new Object[] {});	 
 	}
-	public ResultSet exe(String sql, Object[] params) throws Exception{
+	public ResultSet exe(String sql, Object[] params) throws SQLException{
 		closeStmt();
 		currentStatement = prepare(currentStatement, sql, params);
 		currentStatement.executeQuery();
@@ -47,12 +50,12 @@ public class Zorro {
 	public int update(String sql) throws Exception{
 		return update(sql, new Object[] {});	 
 	}
-	public int update(String sql, Object[] params) throws Exception{
+	public int update(String sql, Object[] params) throws SQLException{
 		closeStmt();
 		currentStatement = prepare(currentStatement, sql, params);
 		return currentStatement.executeUpdate();
 	}
-	private PreparedStatement prepare(PreparedStatement stmt, String sql,Object[] params) throws Exception{
+	private PreparedStatement prepare(PreparedStatement stmt, String sql,Object[] params) throws SQLException{
 		stmt = db.prepareStatement(sql);
 		for(int i=0;i<params.length;i++){
 			int paramIndex=i+1;
@@ -63,7 +66,7 @@ public class Zorro {
 			}else if(params[i] instanceof Double){
 				stmt.setDouble(paramIndex, ((Double)params[i]));
 			}else{
-				throw new Exception("Unknown parameter");
+				throw new SQLException("Unknown parameter");
 			}
 		}
 		return stmt;
