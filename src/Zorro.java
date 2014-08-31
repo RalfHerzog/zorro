@@ -1,6 +1,5 @@
-
-
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,10 +33,17 @@ public class Zorro {
 		printResult();
 		close();
 	}
-	public void connect() throws SQLException {
-		connect(config.getProperty("dbhost"), config.getProperty("dbname"), config.getProperty("dbuser"), config.getProperty("dbpass"));
+	public Zorro(String sql, Object[] params) throws Exception {
+		config=Config.getConfig();
+		connect();
+		System.out.println(update(sql, params));
+		close();
 	}
-	public void connect(String dbHost, String dbName, String dbUser, String dbPass) throws SQLException{
+	public Zorro connect() throws Exception {
+		connect(config.getProperty("dbhost"), config.getProperty("dbname"), config.getProperty("dbuser"), config.getProperty("dbpass"));
+		return this;
+	}
+	public Zorro connect(String dbHost, String dbName, String dbUser, String dbPass) throws Exception{
 		if(db!=null){
 			db.close();
 		}
@@ -47,6 +53,7 @@ public class Zorro {
 			e.printStackTrace();
 		}
 		db = DriverManager.getConnection("jdbc:mysql://" + dbHost + "/"+ dbName, dbUser, dbPass);
+		return this;
 	}
 	public ResultSet exe(String sql) throws SQLException{
 		return exe(sql, new Object[] {});	 
@@ -80,6 +87,10 @@ public class Zorro {
 				stmt.setInt(paramIndex, ((Integer)params[i]));
 			}else if(params[i] instanceof Double){
 				stmt.setDouble(paramIndex, ((Double)params[i]));
+			}else if(params[i] instanceof Date){
+				stmt.setDate(paramIndex, (Date) params[i]);
+			}else if(params[i]==null){
+				stmt.setObject(paramIndex, null);
 			}else{
 				throw new SQLException("Unknown parameter class");
 			}
@@ -126,6 +137,8 @@ public class Zorro {
 				}
 				sb.append("===========================================================\r\n");
 				sb.append(rows+" rows in set");
+			
+				currentResultSet.first();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
